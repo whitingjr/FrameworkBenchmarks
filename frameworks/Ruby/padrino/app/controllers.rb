@@ -1,14 +1,17 @@
 HelloWorld::App.controllers  do
   get '/json', :provides => [:js] do
+    content_type 'application/json'
     {message: "Hello, World!"}.to_json
   end
 
   get '/db', :provides => [:js] do
+    content_type 'application/json'
     id = Random.rand(10000) + 1
     World.get(id).attributes.to_json
   end
 
   get '/queries', :provides => [:js] do
+    content_type 'application/json'
     queries = params['queries'].to_i
     queries = 1 if queries < 1
     queries = 500 if queries > 500
@@ -27,6 +30,7 @@ HelloWorld::App.controllers  do
   end
 
   get '/updates', :provides => [:js] do
+    content_type 'application/json'
     queries = params['queries'].to_i
     queries = 1 if queries < 1
     queries = 500 if queries > 500
@@ -42,7 +46,7 @@ HelloWorld::App.controllers  do
     sql = "INSERT INTO `World` (`id`,`randomNumber`) VALUES #{values} ON DUPLICATE KEY UPDATE `World`.`randomNumber` = VALUES(`randomNumber`)"
     adapter = DataMapper.repository(:default).adapter
     adapter.execute(sql)
-    
+
     worlds.to_json
   end
 
