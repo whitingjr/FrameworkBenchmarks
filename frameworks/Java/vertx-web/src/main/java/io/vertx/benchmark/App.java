@@ -6,10 +6,14 @@ import com.github.susom.database.DatabaseProviderVertx;
 import com.github.susom.database.DatabaseProviderVertx.Builder;
 import com.github.susom.database.Sql;
 import com.github.susom.database.SqlInsert;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.util.AsciiString;
 import io.vertx.benchmark.model.Fortune;
 import io.vertx.benchmark.model.Message;
 import io.vertx.benchmark.model.World;
 import io.vertx.core.*;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -57,9 +61,9 @@ public class App extends AbstractVerticle {
         }
 
         ctx.response()
-            .putHeader(HttpHeaders.SERVER, SERVER)
+            .putHeader(HttpHeaders.SERVER, VERTX)
             .putHeader(HttpHeaders.DATE, date)
-            .putHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+            .putHeader(HttpHeaders.CONTENT_TYPE, RESPONSE_TYPE_JSON)
             .end(new World(findOne.result()).encode());
       });
     }
@@ -75,9 +79,9 @@ public class App extends AbstractVerticle {
           if (idx == queries) {
             // stop condition
             ctx.response()
-                .putHeader(HttpHeaders.SERVER, SERVER)
+                .putHeader(HttpHeaders.SERVER, VERTX)
                 .putHeader(HttpHeaders.DATE, date)
-                .putHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                .putHeader(HttpHeaders.CONTENT_TYPE, RESPONSE_TYPE_JSON)
                 .end(new JsonArray(Arrays.asList(worlds)).encode());
 
           } else {
@@ -120,9 +124,9 @@ public class App extends AbstractVerticle {
         engine.render(ctx, "templates/fortunes.hbs", res -> {
           if (res.succeeded()) {
             ctx.response()
-                .putHeader(HttpHeaders.SERVER, SERVER)
+                .putHeader(HttpHeaders.SERVER, VERTX)
                 .putHeader(HttpHeaders.DATE, date)
-                .putHeader(HttpHeaders.CONTENT_TYPE, "text/html; charset=UTF-8")
+                .putHeader(HttpHeaders.CONTENT_TYPE, RESPONSE_TYPE_TEXT_HTML)
                 .end(res.result());
           } else {
             ctx.fail(res.cause());
@@ -141,9 +145,9 @@ public class App extends AbstractVerticle {
           if (idx == queries) {
             // stop condition
             ctx.response()
-                .putHeader(HttpHeaders.SERVER, SERVER)
+                .putHeader(HttpHeaders.SERVER, VERTX)
                 .putHeader(HttpHeaders.DATE, date)
-                .putHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                .putHeader(HttpHeaders.CONTENT_TYPE, RESPONSE_TYPE_JSON)
                 .end(new JsonArray(Arrays.asList(worlds)).encode());
 
           } else {
@@ -237,9 +241,9 @@ public class App extends AbstractVerticle {
           final JsonArray row = resultSet.get(0);
 
           ctx.response()
-              .putHeader(HttpHeaders.SERVER, SERVER)
+              .putHeader(HttpHeaders.SERVER, VERTX)
               .putHeader(HttpHeaders.DATE, date)
-              .putHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+              .putHeader(HttpHeaders.CONTENT_TYPE, RESPONSE_TYPE_JSON)
               .end(new World(row.getInteger(0), row.getInteger(1)).encode());
         });
       });
@@ -263,9 +267,9 @@ public class App extends AbstractVerticle {
             if (idx == queries) {
               // stop condition
               ctx.response()
-                  .putHeader(HttpHeaders.SERVER, SERVER)
+                  .putHeader(HttpHeaders.SERVER, VERTX)
                   .putHeader(HttpHeaders.DATE, date)
-                  .putHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                  .putHeader(HttpHeaders.CONTENT_TYPE, RESPONSE_TYPE_JSON)
                   .end(worlds.encode());
 
               conn.close();
@@ -339,9 +343,9 @@ public class App extends AbstractVerticle {
           engine.render(ctx, "templates/fortunes.hbs", res -> {
             if (res.succeeded()) {
               ctx.response()
-                  .putHeader(HttpHeaders.SERVER, SERVER)
+                  .putHeader(HttpHeaders.SERVER, VERTX)
                   .putHeader(HttpHeaders.DATE, date)
-                  .putHeader(HttpHeaders.CONTENT_TYPE, "text/html; charset=UTF-8")
+                  .putHeader(HttpHeaders.CONTENT_TYPE, RESPONSE_TYPE_TEXT_HTML)
                   .end(res.result());
             } else {
               ctx.fail(res.cause());
@@ -379,9 +383,9 @@ public class App extends AbstractVerticle {
               switch (dbms) {
                 case MYSQL:
                   ctx.response()
-                      .putHeader(HttpHeaders.SERVER, SERVER)
+                      .putHeader(HttpHeaders.SERVER, VERTX)
                       .putHeader(HttpHeaders.DATE, date)
-                      .putHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                      .putHeader(HttpHeaders.CONTENT_TYPE, RESPONSE_TYPE_JSON)
                       .end(worlds.encode());
 
                   conn.close();
@@ -395,9 +399,9 @@ public class App extends AbstractVerticle {
                       return;
                     }
                     ctx.response()
-                        .putHeader(HttpHeaders.SERVER, SERVER)
+                        .putHeader(HttpHeaders.SERVER, VERTX)
                         .putHeader(HttpHeaders.DATE, date)
-                        .putHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                        .putHeader(HttpHeaders.CONTENT_TYPE, RESPONSE_TYPE_JSON)
                         .end(worlds.encode());
 
                     conn.close();
@@ -489,9 +493,9 @@ public class App extends AbstractVerticle {
             ctx.fail(404);
           } else {
             ctx.response()
-                .putHeader(HttpHeaders.SERVER, SERVER)
+                .putHeader(HttpHeaders.SERVER, VERTX)
                 .putHeader(HttpHeaders.DATE, date)
-                .putHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                .putHeader(HttpHeaders.CONTENT_TYPE, RESPONSE_TYPE_JSON)
                 .end(call.result());
           }
         } else {
@@ -518,9 +522,9 @@ public class App extends AbstractVerticle {
             ctx.fail(404);
           } else {
             ctx.response()
-                .putHeader(HttpHeaders.SERVER, SERVER)
+                .putHeader(HttpHeaders.SERVER, VERTX)
                 .putHeader(HttpHeaders.DATE, date)
-                .putHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                .putHeader(HttpHeaders.CONTENT_TYPE, RESPONSE_TYPE_JSON)
                 .end(call.result());
           }
         } else {
@@ -546,9 +550,9 @@ public class App extends AbstractVerticle {
             engine.render(ctx, "templates/fortunes.hbs", res -> {
               if (res.succeeded()) {
                 ctx.response()
-                    .putHeader(HttpHeaders.SERVER, SERVER)
+                    .putHeader(HttpHeaders.SERVER, VERTX)
                     .putHeader(HttpHeaders.DATE, date)
-                    .putHeader(HttpHeaders.CONTENT_TYPE, "text/html; charset=UTF-8")
+                    .putHeader(HttpHeaders.CONTENT_TYPE, RESPONSE_TYPE_TEXT_HTML)
                     .end(res.result());
               } else {
                 ctx.fail(res.cause());
@@ -588,9 +592,9 @@ public class App extends AbstractVerticle {
             ctx.fail(404);
           } else {
             ctx.response()
-                .putHeader(HttpHeaders.SERVER, SERVER)
+                .putHeader(HttpHeaders.SERVER, VERTX)
                 .putHeader(HttpHeaders.DATE, date)
-                .putHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                .putHeader(HttpHeaders.CONTENT_TYPE, RESPONSE_TYPE_JSON)
                 .end(call.result());
           }
         } else {
@@ -600,14 +604,22 @@ public class App extends AbstractVerticle {
     }
   }
 
-  private static final String SERVER = "vertx-web";
-  private String date;
+  private static final CharSequence VERTX = new AsciiString("vertx".toCharArray());
+  private static CharSequence date;
+
+  private static final CharSequence RESPONSE_TYPE_TEXT_HTML = new AsciiString("text/html");
+  private static final CharSequence RESPONSE_TYPE_TEXT_PLAIN = new AsciiString("text/plain");
+  private static final CharSequence RESPONSE_TYPE_JSON = new AsciiString("application/json");
+
+  private static final String PLAIN_HELLO_WORLD = "Hello, World!";
+  private static final CharSequence PLAIN_HELLO_WORLD_CONTENT_LENGTH = new AsciiString(String.valueOf(PLAIN_HELLO_WORLD.length()));
+  private static final Buffer PLAIN_HELLO_WORLD_BUFFER = Buffer.buffer(PLAIN_HELLO_WORLD);
 
   @Override
   public void start() {
     final Router app = Router.router(vertx);
 
-    vertx.setPeriodic(1000, handler -> date = DateTimeFormatter.RFC_1123_DATE_TIME.format(ZonedDateTime.now()));
+    date = new AsciiString(DateTimeFormatter.RFC_1123_DATE_TIME.format(ZonedDateTime.now()).getBytes());
 
     final MongoDB mongoDB = new MongoDB(vertx, config());
     final AsyncSQL psql = new AsyncSQL(vertx, AsyncSQL.POSTGRES, config());
@@ -620,10 +632,10 @@ public class App extends AbstractVerticle {
      */
     app.get("/json").handler(ctx -> {
       ctx.response()
-          .putHeader(HttpHeaders.SERVER, SERVER)
+          .putHeader(HttpHeaders.SERVER, VERTX)
           .putHeader(HttpHeaders.DATE, date)
-          .putHeader(HttpHeaders.CONTENT_TYPE, "application/json")
-          .end(new Message("Hello, World!").encode());
+          .putHeader(HttpHeaders.CONTENT_TYPE, RESPONSE_TYPE_JSON)
+          .end(new Message(PLAIN_HELLO_WORLD).encode());
     });
 
     /**
@@ -672,10 +684,10 @@ public class App extends AbstractVerticle {
      */
     app.get("/plaintext").handler(ctx -> {
       ctx.response()
-          .putHeader(HttpHeaders.SERVER, SERVER)
+          .putHeader(HttpHeaders.SERVER, VERTX)
           .putHeader(HttpHeaders.DATE, date)
-          .putHeader(HttpHeaders.CONTENT_TYPE, "text/plain")
-          .end("Hello, World!");
+          .putHeader(HttpHeaders.CONTENT_TYPE, RESPONSE_TYPE_TEXT_PLAIN)
+          .end(PLAIN_HELLO_WORLD_BUFFER);
     });
 
     vertx.createHttpServer().requestHandler(app::accept).listen(8080);
